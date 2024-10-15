@@ -1,4 +1,4 @@
-﻿namespace Backend_Lab1_RESTAPI.Models
+﻿namespace Backend_Lab2_RESTAPI.Models
 {
 	public class Record
 	{

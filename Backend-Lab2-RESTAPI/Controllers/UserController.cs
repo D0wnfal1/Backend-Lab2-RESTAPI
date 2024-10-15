@@ -1,9 +1,7 @@
-﻿using Backend_Lab1_RESTAPI.Models;
+﻿using Backend_Lab2_RESTAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
-using System.Linq;
 
-namespace Backend_Lab1_RESTAPI.Controllers
+namespace Backend_Lab2_RESTAPI.Controllers
 {
 	[Route("user")]
 	[ApiController]
