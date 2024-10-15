@@ -1,0 +1,6 @@
+@Backend_Lab2_RESTAPI_HostAddress = http://localhost:5265
+
+GET {{Backend_Lab2_RESTAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
