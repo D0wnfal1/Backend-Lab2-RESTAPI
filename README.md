@@ -1,42 +1,23 @@
 # Backend-Lab2-RESTAPI
 
+## Варіант 1: Валюти
+
 **.NET SDK**: Якщо ви хочете запустити проект локально, вам знадобиться встановлений .NET SDK. Ви можете завантажити його з [офіційного сайту .NET](https://dotnet.microsoft.com/download).
 
 ## Клонуйте репозиторій
 
 ```sh
-git clone https://github.com/D0wnfal1/Backend-Lab2-ProjectTemplate
-cd Backend-Lab2-ProjectTemplate
+git clone https://github.com/D0wnfal1/Backend-Lab2-RESTAPI
+cd WarehouseManager
 ```
 
-## Відновіть залежності
+## Запустіть додатку
 
 ```sh
-dotnet restore
-```
-
-## Налаштуйте середовище
-
-Перед запуском проекту ви можете встановити змінну середовища `ASPNETCORE_ENVIRONMENT` на `Development`, щоб активувати режим розробника:
-
-### Windows
-
-```sh
-set ASPNETCORE_ENVIRONMENT=Development
-```
-
-### Linux / macOS
-
-```sh
-export ASPNETCORE_ENVIRONMENT=Development
-```
-
-## Запустіть проект
-
-```sh
-dotnet run
+cd WarehouseManager
+docker-compose up
 ```
 
 ## Перевірте API
 
-Ви можете перевірити API через Swagger, відкривши [http://localhost:5066/swagger](http://localhost:5066/swagger) у браузері. Swagger надає зручний інтерфейс для тестування ендпоінтів.
+Ви можете перевірити API через Swagger, відкривши http://localhost:5066/swagger у браузері. Swagger надає зручний інтерфейс для тестування ендпоінтів.
