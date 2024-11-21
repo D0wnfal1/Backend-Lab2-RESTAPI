@@ -1,82 +1,87 @@
-﻿using Backend_Lab2_RESTAPI.Models;
+﻿using Backend_Lab2_RESTAPI.Data;
+using Backend_Lab2_RESTAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
+using Backend_Lab2_RESTAPI.Validation;
 
-namespace Backend_Lab2_RESTAPI.Controllers;
-
-[Route("record")]
-[ApiController]
-public class RecordController : ControllerBase
+namespace Backend_Lab2_RESTAPI.Controllers
 {
-	private static List<Record> _records = new List<Record>
+	[Route("record")]
+	[ApiController]
+	public class RecordController : ControllerBase
 	{
-		new Record { Id = 1, UserId = 1, CategoryId = 1, CreateTime = DateTime.Now, Amount = 100},
-		new Record { Id = 2, UserId = 3, CategoryId = 1, CreateTime = DateTime.Now, Amount = 200},
-		new Record { Id = 3, UserId = 2, CategoryId = 2, CreateTime = DateTime.Now, Amount = 300},
-	};
+		private readonly AppDbContext _dbContext;
+		private readonly IValidator<Record> _recordValidator;
 
-	[HttpGet("{id}")]
-	public IActionResult GetRecordById(int id)
-	{
-		var record = _records.FirstOrDefault(p => p.Id == id);
-		if (record == null)
+		public RecordController(AppDbContext dbContext, IValidator<Record> recordValidator)
 		{
-			return NotFound();
-		}
-		return Ok(record);
-	}
-
-	[HttpDelete("{id}")]
-	public IActionResult DeleteRecord(int id)
-	{
-		var record = _records.FirstOrDefault(p => p.Id == id);
-		if (record == null)
-		{
-			return NotFound();
-		}
-		_records.Remove(record);
-		return Ok(record);
-	}
-
-	[HttpPost]
-	public IActionResult CreateRecord(int userId, int categoryId, decimal total)
-	{
-		Record record = new Record()
-		{
-			UserId = userId,
-			CategoryId = categoryId,
-			CreateTime = DateTime.Now,
-			Amount = total
-		};
-		record.Id = _records.Max(p => p.Id) + 1;
-		_records.Add(record);
-		return CreatedAtAction(nameof(GetRecordById), new { id = record.Id }, record);
-	}
-
-	[HttpGet]
-	public IActionResult GetRecord(int? userId, int? categoryId)
-	{
-		if (userId == null && categoryId == null)
-		{
-			return BadRequest($"User with ID {userId} or {categoryId} not found.");
+			_dbContext = dbContext;
+			_recordValidator = recordValidator;
 		}
 
-		var filteredRecords = _records.AsQueryable();
-
-		if (userId != null)
+		[HttpGet("{id}")]
+		public IActionResult GetRecordById(int id)
 		{
-			filteredRecords = filteredRecords.Where(p => p.UserId == userId);
+			var record = _dbContext.Records.FirstOrDefault(p => p.Id == id);
+			if (record == null)
+			{
+				return NotFound($"Record with ID {id} not found.");
+			}
+			return Ok(record);
 		}
 
-		if (categoryId != null)
+		[HttpPost]
+		public IActionResult CreateRecord([FromBody] Record record)
 		{
-			filteredRecords = filteredRecords.Where(p => p.CategoryId == categoryId);
+			var validationResult = _recordValidator.Validate(record);
+			if (!validationResult.IsValid)
+			{
+				return BadRequest(validationResult.Errors);
+			}
+
+			record.Id = _dbContext.Records.Any() ? _dbContext.Records.Max(p => p.Id) + 1 : 1;
+			record.CreateTime = DateTime.UtcNow;
+
+			_dbContext.Records.Add(record);
+			_dbContext.SaveChanges();
+			return CreatedAtAction(nameof(GetRecordById), new { id = record.Id }, record);
 		}
 
-		if (!filteredRecords.Any())
+		[HttpDelete("{id}")]
+		public IActionResult DeleteRecord(int id)
 		{
-			return NotFound("No records found with the specified criteria.");
+			var record = _dbContext.Records.FirstOrDefault(p => p.Id == id);
+			if (record == null)
+			{
+				return NotFound($"Record with ID {id} not found.");
+			}
+
+			_dbContext.Records.Remove(record);
+			_dbContext.SaveChanges();
+			return NoContent();
 		}
 
-		return Ok(filteredRecords);
+		[HttpGet]
+		public IActionResult GetRecords([FromQuery] int? userId, [FromQuery] int? categoryId)
+		{
+			var filteredRecords = _dbContext.Records.AsQueryable();
+
+			if (userId.HasValue)
+			{
+				filteredRecords = filteredRecords.Where(p => p.UserId == userId.Value);
+			}
+
+			if (categoryId.HasValue)
+			{
+				filteredRecords = filteredRecords.Where(p => p.CategoryId == categoryId.Value);
+			}
+
+			if (!filteredRecords.Any())
+			{
+				return NotFound("No records found with the specified criteria.");
+			}
+
+			return Ok(filteredRecords);
+		}
 	}
 }

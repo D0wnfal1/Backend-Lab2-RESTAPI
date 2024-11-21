@@ -10,7 +10,6 @@ namespace Backend_Lab2_RESTAPI.Models
         public int CategoryId { get; set; }
 		private DateTime _createtime;
 
-		[Required]
 		public DateTime CreateTime
 		{
 			get => _createtime;
@@ -22,5 +21,8 @@ namespace Backend_Lab2_RESTAPI.Models
 			}
 		}
 		public decimal Amount { get; set; }
-    }
+		public int? CurrencyId { get; set; } 
+
+		public Currency Currency { get; set; }
+	}
 }

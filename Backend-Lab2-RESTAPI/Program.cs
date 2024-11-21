@@ -1,4 +1,7 @@
 using Backend_Lab2_RESTAPI.Data;
+using Backend_Lab2_RESTAPI.Validation;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.EntityFrameworkCore; 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,6 +9,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 
 builder.Services.AddControllers();
+
+builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
+builder.Services.AddValidatorsFromAssemblyContaining<RecordValidator>(); 
+builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>(); 
+
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
 	options.UseNpgsql(builder.Configuration.GetConnectionString("RestApiDb"));

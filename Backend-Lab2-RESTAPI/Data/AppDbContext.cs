@@ -19,6 +19,12 @@ namespace Backend_Lab2_RESTAPI.Data
 		{
 			base.OnModelCreating(modelBuilder);
 
+			modelBuilder.Entity<User>()
+				.HasOne(u => u.DefaultCurrency)
+				.WithMany()
+				.HasForeignKey(u => u.DefaultCurrencyId)
+				.OnDelete(DeleteBehavior.Restrict);
+
 			modelBuilder.Entity<Record>()
 				.HasOne<User>()
 				.WithMany()
@@ -31,19 +37,26 @@ namespace Backend_Lab2_RESTAPI.Data
 				.HasForeignKey(r => r.CategoryId)
 				.OnDelete(DeleteBehavior.Cascade);
 
+			modelBuilder.Entity<Record>()
+				.HasOne(r => r.Currency)
+				.WithMany()
+				.HasForeignKey(r => r.CurrencyId)
+				.OnDelete(DeleteBehavior.SetNull);
+
+			modelBuilder.Entity<Currency>().HasData(
+				new Currency { Id = 1, Name = "USD" },
+				new Currency { Id = 2, Name = "EUR" },
+				new Currency { Id = 3, Name = "UAH" }
+			);
+
 			modelBuilder.Entity<User>().HasData(
-				new User { Id = 1, Name = "John Doe" },
-				new User { Id = 2, Name = "Jane Smith" }
+				new User { Id = 1, Name = "John Doe", DefaultCurrencyId = 1 },
+				new User { Id = 2, Name = "Jane Smith", DefaultCurrencyId = 3 }
 			);
 
 			modelBuilder.Entity<Category>().HasData(
 				new Category { Id = 1, CategoryName = "Food" },
 				new Category { Id = 2, CategoryName = "Entertainment" }
-			);
-
-			modelBuilder.Entity<Currency>().HasData(
-				new Currency { Id = 1, Name = "USD" },
-				new Currency { Id = 2, Name = "EUR" }
 			);
 
 			modelBuilder.Entity<Record>().HasData(
@@ -53,7 +66,8 @@ namespace Backend_Lab2_RESTAPI.Data
 					UserId = 1,
 					CategoryId = 1,
 					CreateTime = DateTime.UtcNow,
-					Amount = 50.75m
+					Amount = 50.75m,
+					CurrencyId = 2 
 				},
 				new Record
 				{
@@ -61,7 +75,8 @@ namespace Backend_Lab2_RESTAPI.Data
 					UserId = 2,
 					CategoryId = 2,
 					CreateTime = DateTime.UtcNow,
-					Amount = 20.00m
+					Amount = 20.00m,
+					CurrencyId = null 
 				}
 			);
 		}

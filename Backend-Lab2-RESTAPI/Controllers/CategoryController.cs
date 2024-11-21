@@ -1,5 +1,8 @@
-﻿using Backend_Lab2_RESTAPI.Models;
+﻿using Backend_Lab2_RESTAPI.Data;
+using Backend_Lab2_RESTAPI.Models;
 using Microsoft.AspNetCore.Mvc;
+using FluentValidation;
+using Backend_Lab2_RESTAPI.Validation;
 
 namespace Backend_Lab2_RESTAPI.Controllers
 {
@@ -7,46 +10,48 @@ namespace Backend_Lab2_RESTAPI.Controllers
 	[ApiController]
 	public class CategoryController : ControllerBase
 	{
-		private static List<Category> _categories = new List<Category>
+		private readonly AppDbContext _dbContext;
+		private readonly IValidator<Category> _categoryValidator;
+
+		public CategoryController(AppDbContext dbContext, IValidator<Category> categoryValidator)
 		{
-			new Category { Id = 1, CategoryName = "Appetizers" },
-			new Category { Id = 2, CategoryName = "Main Courses" },
-			new Category { Id = 3, CategoryName = "Drinks" }
-		};
+			_dbContext = dbContext;
+			_categoryValidator = categoryValidator;
+		}
 
 		[HttpGet]
 		public IActionResult GetCategories()
 		{
-			return Ok(_categories);
+			return Ok(_dbContext.Categories);
 		}
 
 		[HttpPost]
-		public IActionResult CreateCategory(string categoryName)
+		public IActionResult CreateCategory([FromBody] Category category)
 		{
-			if (categoryName == null || string.IsNullOrEmpty(categoryName))
+			var validationResult = _categoryValidator.Validate(category);
+			if (!validationResult.IsValid)
 			{
-				return BadRequest("Invalid category name.");
+				return BadRequest(validationResult.Errors);
 			}
-			Category newCategory = new Category()
-			{
-				CategoryName = categoryName
-			};
-			newCategory.Id = _categories.Max(c => c.Id) + 1;
 
-			_categories.Add(newCategory);
-			return CreatedAtAction(nameof(GetCategories), new { id = newCategory.Id }, newCategory);
+			category.Id = _dbContext.Categories.Any() ? _dbContext.Categories.Max(c => c.Id) + 1 : 1;
+
+			_dbContext.Categories.Add(category);
+			_dbContext.SaveChanges();
+			return CreatedAtAction(nameof(GetCategories), new { id = category.Id }, category);
 		}
 
 		[HttpDelete("{id}")]
 		public IActionResult DeleteCategory(int id)
 		{
-			var category = _categories.FirstOrDefault(c => c.Id == id);
+			var category = _dbContext.Categories.FirstOrDefault(c => c.Id == id);
 			if (category == null)
 			{
 				return NotFound($"Category with ID {id} not found.");
 			}
 
-			_categories.Remove(category);
+			_dbContext.Categories.Remove(category);
+			_dbContext.SaveChanges();
 			return NoContent();
 		}
 	}
