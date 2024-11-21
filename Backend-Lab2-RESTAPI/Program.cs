@@ -27,6 +27,17 @@ builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+	var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	if (context.Database.CanConnect())
+	{
+		context.Database.EnsureDeleted();
+	}
+	context.Database.EnsureCreated();
+
+	context.SaveChanges();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
