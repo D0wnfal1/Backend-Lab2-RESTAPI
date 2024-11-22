@@ -3,11 +3,13 @@ using Backend_Lab2_RESTAPI.Models;
 using Microsoft.AspNetCore.Mvc;
 using FluentValidation;
 using Backend_Lab2_RESTAPI.Validation;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend_Lab2_RESTAPI.Controllers
 {
 	[Route("category")]
 	[ApiController]
+	[Authorize]
 	public class CategoryController : ControllerBase
 	{
 		private readonly AppDbContext _dbContext;

@@ -5,6 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
 using Backend_Lab2_RESTAPI.Data;
+using System.Security.Claims;
+using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Backend_Lab2_RESTAPI.Controllers
 {
@@ -62,16 +67,41 @@ namespace Backend_Lab2_RESTAPI.Controllers
 			{
 				return BadRequest();
 			}
+			JwtSecurityTokenHandler tokenHandler = new();
+			byte[] key = Encoding.ASCII.GetBytes(secretKey);
+
+			SecurityTokenDescriptor tokenDescriptor = new()
+			{
+				Subject = new ClaimsIdentity(new Claim[]
+				{
+					new Claim("fullName", userFromDb.Name),
+					new Claim("id", userFromDb.Id.ToString()),
+					new Claim(ClaimTypes.Email, userFromDb.UserName.ToString()),
+				}),
+				Expires = DateTime.UtcNow.AddDays(7),
+				SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+			};
+
+			SecurityToken token = tokenHandler.CreateToken(tokenDescriptor);
+
 			LoginResponseDto loginResponse = new()
 			{
 				Email = userFromDb.Email,
-				Token = secretKey
+				Token = tokenHandler.WriteToken(token)
 			};
+
 			if (loginResponse.Email == null || string.IsNullOrEmpty(loginResponse.Token))
 			{
 				return BadRequest();
 			}
 			return Ok(loginResponse);
+		}
+
+		[HttpGet("test")]
+		[Authorize]
+		public async Task<ActionResult<string>> AuthTest()
+		{
+			return "You are authenticated";
 		}
 	}
 }
