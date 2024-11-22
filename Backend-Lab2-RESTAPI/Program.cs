@@ -17,10 +17,13 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
+
+string? getEnv = Environment.GetEnvironmentVariable("RestApiDb");
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-{
-	options.UseNpgsql(builder.Configuration.GetConnectionString("RestApiDb"));
-});
+	options.UseNpgsql(getEnv));
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
