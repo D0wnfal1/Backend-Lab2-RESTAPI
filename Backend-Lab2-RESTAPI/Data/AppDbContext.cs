@@ -14,6 +14,7 @@ namespace Backend_Lab2_RESTAPI.Data
 		public DbSet<Record> Records { get; set; }
 		public DbSet<User> Users { get; set; }
 		public DbSet<Currency> Currencies { get; set; }
+		public DbSet<ApplicationUser> ApplicationUsers { get; set; }
 
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
