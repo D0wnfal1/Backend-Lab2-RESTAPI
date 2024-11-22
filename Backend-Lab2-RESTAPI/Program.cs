@@ -1,7 +1,9 @@
 using Backend_Lab2_RESTAPI.Data;
+using Backend_Lab2_RESTAPI.Models;
 using Backend_Lab2_RESTAPI.Validation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore; 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,10 +20,16 @@ builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
 
+
 string? getEnv = Environment.GetEnvironmentVariable("RestApiDb");
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 	options.UseNpgsql(getEnv));
+
+builder.Services.AddIdentityCore<ApplicationUser>()
+	.AddEntityFrameworkStores<AppDbContext>()
+	.AddDefaultTokenProviders();
+
 
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle

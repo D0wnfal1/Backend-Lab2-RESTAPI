@@ -1,10 +1,10 @@
 ﻿using Backend_Lab2_RESTAPI.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace Backend_Lab2_RESTAPI.Data
 {
-	public class AppDbContext : DbContext
+	public class AppDbContext : IdentityDbContext<ApplicationUser>
 	{
 		public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
 		{
