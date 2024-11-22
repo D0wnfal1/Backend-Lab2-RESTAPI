@@ -40,7 +40,7 @@ namespace Backend_Lab2_RESTAPI.Data.DbInitializer
 			if (!_db.Users.Any())
 			{
 				_db.Users.AddRange(
-					new User { Id = 1, Name = "John Doe", DefaultCurrencyId = 1 },
+					new User { Id = 1, Name = "John Doe", DefaultCurrencyId = 1  },
 					new User { Id = 2, Name = "Jane Smith", DefaultCurrencyId = 3 }
 				);
 				_db.SaveChanges();
