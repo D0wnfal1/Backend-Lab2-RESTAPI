@@ -23,7 +23,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>();
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
 
-var key = builder.Configuration.GetValue<string>("ApiSettings:Token");
+string? key = Environment.GetEnvironmentVariable("Token");
 builder.Services.AddAuthentication(u =>
 {
 	u.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
