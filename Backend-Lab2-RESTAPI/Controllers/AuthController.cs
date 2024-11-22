@@ -20,11 +20,10 @@ namespace Backend_Lab2_RESTAPI.Controllers
 		private readonly AppDbContext _db;
 		private readonly UserManager<ApplicationUser> _userManager;
 		private string secretKey;
-		public AuthController(AppDbContext db, IConfiguration configuration,
-			UserManager<ApplicationUser> userManager)
+		public AuthController(AppDbContext db, UserManager<ApplicationUser> userManager)
 		{
 			_db = db;
-			secretKey = configuration.GetValue<string>("ApiSettings:Token");
+			secretKey = Environment.GetEnvironmentVariable("Token");
 			_userManager = userManager;
 		}
 		[HttpPost("register")]
