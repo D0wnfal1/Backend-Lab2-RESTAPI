@@ -1,5 +1,4 @@
 using Backend_Lab2_RESTAPI.Data;
-using Backend_Lab2_RESTAPI.Data.DbInitializer;
 using Backend_Lab2_RESTAPI.Validation;
 using FluentValidation;
 using FluentValidation.AspNetCore;
@@ -14,7 +13,6 @@ builder.Services.AddControllers();
 builder.Services.AddValidatorsFromAssemblyContaining<CategoryValidator>();
 builder.Services.AddValidatorsFromAssemblyContaining<RecordValidator>(); 
 builder.Services.AddValidatorsFromAssemblyContaining<UserValidator>(); 
-builder.Services.AddScoped<IDbInitializer, DbInitialize>();
 
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddFluentValidationClientsideAdapters();
@@ -23,15 +21,23 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 {
 	options.UseNpgsql(builder.Configuration.GetConnectionString("RestApiDb"));
 });
-builder.Services.AddScoped<IDbInitializer, DbInitialize>();
-
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+	var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+	if (context.Database.CanConnect())
+	{
+		context.Database.EnsureDeleted();
+	}
+	context.Database.EnsureCreated();
 
+	context.SaveChanges();
+}
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
