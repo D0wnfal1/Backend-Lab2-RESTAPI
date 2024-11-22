@@ -364,3 +364,4 @@ FodyWeavers.xsd
 /Backend-Lab2-RESTAPI/appsettings.json
 # .gitignore
 *.env
+/Backend-Lab2-RESTAPI/appsettings.json
